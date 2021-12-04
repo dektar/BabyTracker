@@ -308,9 +308,12 @@ function makeCsv(event) {
   event.stopPropagation();
   let categories = selectedCategories();
   let allEvents = [];
-  // For each category, get data from all time and store it locally
+  // For each category, get data from Dec 3 2021 and store it locally.
+  // Remove this .where clause to get numberOne's data also.
+  let numberTwoMin = new firebase.firestore.Timestamp(1638588112, 0);
   categories.forEach((category, index) => {
     var query = firebase.firestore().collection(category)
+        .where('time', '>', numberTwoMin)
         .orderBy('time', 'desc').get().then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
               var data = doc.data();
@@ -350,7 +353,6 @@ function loadRecentData() {
   categories.forEach(category => {
 	  // Create the query to load entries and listen for new ones.
 	  // TODO: Paginate results to reduce count of returned items.
-	  // TODO: Export to CSV.
 	  let now = new Date();
 	  let days = timeFilter.value;
 	  let then = new firebase.firestore.Timestamp.fromMillis(now.getTime() - 24*60*60*1000*days);
