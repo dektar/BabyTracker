@@ -396,12 +396,16 @@ function analyzeData(category, items) {
   	  items = [{'time': now.getTime(), 'type': 'end'}].concat(items);
   	}
   	for (let i = 0; i < items.length - 1; i+=2) {
+      // Sum up sleep durations for the past 24 hours.
   	  if (items[i].time > yesterday.getTime()) {
+        // If 24 hours ago puts us in the middle of a sleep chunk, only count the
+        // portion that is within the past-24-hour timespan.
   	  	if (items[i + 1].time < yesterday.getTime()) {
-	  	  	items[i + 1].time = yesterday.getTime();
-	  	}
-	  	totalSleepDuration += items[i].time - items[i+1].time;
-	  }
+          totalSleepDuration += items[i].time - yesterday.getTime();
+	  	  } else {
+	  	    totalSleepDuration += items[i].time - items[i+1].time;
+        }
+	    }
   	  if (items[i].type != 'end' || items[i+1].type != 'start') {
   	  	document.getElementById(items[i].id).firstChild.setAttribute('class', 'error');
   	  	console.log('Missed logging a sleep!');
