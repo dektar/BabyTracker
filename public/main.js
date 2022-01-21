@@ -44,7 +44,7 @@ function addSizeToGoogleProfilePic(url) {
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) { // User is signed in!
-  	loadRecentData();
+    loadRecentData();
 
     // Get the signed-in user's profile pic and name.
     var picUrl = getProfilePicUrl();
@@ -98,7 +98,7 @@ function createAndInsertEntry(category, id, timestamp) {
   div.firstChild.removeAttribute('class');
   let confirmButton = div.firstChild.lastChild.firstChild;
   div.firstChild.lastChild.previousSibling.firstChild.addEventListener('click', 
-  		(event) => {confirmButton.removeAttribute('hidden')});
+      (event) => {confirmButton.removeAttribute('hidden')});
   confirmButton.addEventListener('click', (event) => {deleteEntry(category, id)});
 
   // figure out where to insert new data entry.
@@ -145,20 +145,20 @@ function compareCachedObjects(first, second) {
 
 function removeEntryFromCache(category, id) {
   for (let i = 0; i < cachedData[category].length; i++) {
-  	if (cachedData[category][i].id === id) {
-  		cachedData[category].splice(i, 1);
-  		return;
-  	}
+    if (cachedData[category][i].id === id) {
+      cachedData[category].splice(i, 1);
+      return;
+    }
   }
 }
 
 function addEntryToCache(category, entry) {
   // Ensure this isn't a duplicate
   for (let i = 0; i < cachedData[category].length; i++) {
-  	if (entry.id === cachedData[category][i].id) {
-  	  cachedData[category][i] = entry;
-  	  return;
-  	}
+    if (entry.id === cachedData[category][i].id) {
+      cachedData[category][i] = entry;
+      return;
+    }
   }
   cachedData[category].push(entry);
 
@@ -235,31 +235,31 @@ function displayEntry(id, timestamp, category, type, note) {
   let noteHolder = div.querySelector('.note');
   let noteSpan = document.createElement('span')
   if (note) {
-	noteSpan.innerHTML = note;
+  noteSpan.innerHTML = note;
   } else {
-  	noteSpan.innerHTML = 'Add note';
-  	noteSpan.setAttribute('class', 'note-prompt');
+    noteSpan.innerHTML = 'Add note';
+    noteSpan.setAttribute('class', 'note-prompt');
   }
   noteSpan.addEventListener('click', (event) => {
-  	noteSpan.setAttribute('hidden', true);
-	let noteField = document.createElement('input');
-	noteField.setAttribute('type', 'text');
-	noteField.setAttribute('value', note);
-	noteField.setAttribute('placeholder', 'Add note');
-	let saveNote = (event) => {
-	  // Save the new note with category and ID.
-	  firebase.firestore().collection(category).doc(id).update({'note': noteField.value});
-	  noteField.setAttribute('hidden', true);
-	  noteSpan.removeAttribute('hidden');
-	};
-	noteField.addEventListener('change', saveNote);
-	noteField.addEventListener('blur', saveNote);
-	noteHolder.appendChild(noteField);
-	noteField.focus();
+    noteSpan.setAttribute('hidden', true);
+  let noteField = document.createElement('input');
+  noteField.setAttribute('type', 'text');
+  noteField.setAttribute('value', note);
+  noteField.setAttribute('placeholder', 'Add note');
+  let saveNote = (event) => {
+    // Save the new note with category and ID.
+    firebase.firestore().collection(category).doc(id).update({'note': noteField.value});
+    noteField.setAttribute('hidden', true);
+    noteSpan.removeAttribute('hidden');
+  };
+  noteField.addEventListener('change', saveNote);
+  noteField.addEventListener('blur', saveNote);
+  noteHolder.appendChild(noteField);
+  noteField.focus();
   });
   
   while (noteHolder.firstChild) {
-	noteHolder.removeChild(noteHolder.firstChild);
+  noteHolder.removeChild(noteHolder.firstChild);
   }
   noteHolder.appendChild(noteSpan);
 }
@@ -269,7 +269,7 @@ function initializeDateTime() {
   let day = now.getDate();
   let month = now.getMonth() + 1;
   date.value = now.getFullYear() + "-" + (month < 10 ? "0" + month : month) + "-" + 
-  		(day < 10 ? "0" + day : day);
+      (day < 10 ? "0" + day : day);
   let hour = now.getHours();
   let minute = now.getMinutes();
   time.value = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute);
@@ -346,92 +346,92 @@ function makeCsv(event) {
 function loadRecentData() {
   let categories;
   if (entriesFilter.value == 'all') {
-  	categories = ['feeds', 'sleeps', 'meds', 'pumps'];
+    categories = ['feeds', 'sleeps', 'meds', 'pumps'];
   } else {
-  	categories = [entriesFilter.value];
+    categories = [entriesFilter.value];
   }
   categories.forEach(category => {
-	  // Create the query to load entries and listen for new ones.
-	  // TODO: Paginate results to reduce count of returned items.
-	  let now = new Date();
-	  let days = timeFilter.value;
-	  let then = new firebase.firestore.Timestamp.fromMillis(now.getTime() - 24*60*60*1000*days);
-  	  var query = firebase.firestore().collection(category).where('time', '>', then)
-  	  		.orderBy('time', 'desc');
-	  
-	  // Start listening to the query.
-	  query.onSnapshot(function(snapshot) {
-	    snapshot.docChanges().forEach(function(change) {
-	      if (change.type === 'removed') {
-	        deleteHtmlEntry(change.doc.id);
-	        removeEntryFromCache(category, change.doc.id);
-	      } else {
-	        var data = change.doc.data();
-	        displayEntry(change.doc.id, data.time.toMillis(), category, data.type, data.note);
-	        addEntryToCache(category, {'time': data.time.toMillis(), 'type': data.type, 'id': change.doc.id});
-	      }
-	    });
-	    analyzeData(category, cachedData[category]);
-	  });
-	});
+    // Create the query to load entries and listen for new ones.
+    // TODO: Paginate results to reduce count of returned items.
+    let now = new Date();
+    let days = timeFilter.value;
+    let then = new firebase.firestore.Timestamp.fromMillis(now.getTime() - 24*60*60*1000*days);
+      var query = firebase.firestore().collection(category).where('time', '>', then)
+          .orderBy('time', 'desc');
+    
+    // Start listening to the query.
+    query.onSnapshot(function(snapshot) {
+      snapshot.docChanges().forEach(function(change) {
+        if (change.type === 'removed') {
+          deleteHtmlEntry(change.doc.id);
+          removeEntryFromCache(category, change.doc.id);
+        } else {
+          var data = change.doc.data();
+          displayEntry(change.doc.id, data.time.toMillis(), category, data.type, data.note);
+          addEntryToCache(category, {'time': data.time.toMillis(), 'type': data.type, 'id': change.doc.id});
+        }
+      });
+      analyzeData(category, cachedData[category]);
+    });
+  });
 }
 
 function prettyPrintDuration(endTime, startTime) {
   let timeSinceLastSleep = endTime - startTime;
   let minutes = Math.floor(timeSinceLastSleep / (1000 * 60)) % 60;
   return Math.floor(timeSinceLastSleep / (1000 * 60 * 60)) + ':' +
-  	  (minutes > 9 ? minutes : '0' + minutes);
+      (minutes > 9 ? minutes : '0' + minutes);
 }
 
 function analyzeData(category, items) {
   if (items.length == 0) {
-  	return;
+    return;
   }
   let now = new Date();
   let yesterday = new Date(now.getTime() - 24*60*60*1000);
   if (category == 'sleeps') {
-  	lastSleepTime.innerHTML = prettyPrintDuration(now.getTime(), items[0].time);
-  	let totalSleepDuration = 0;
-  	if (items[0].type == 'start') {
-  	  items = [{'time': now.getTime(), 'type': 'end'}].concat(items);
-  	}
-  	for (let i = 0; i < items.length - 1; i+=2) {
+    lastSleepTime.innerHTML = prettyPrintDuration(now.getTime(), items[0].time);
+    let totalSleepDuration = 0;
+    if (items[0].type == 'start') {
+      items = [{'time': now.getTime(), 'type': 'end'}].concat(items);
+    }
+    for (let i = 0; i < items.length - 1; i+=2) {
       // Sum up sleep durations for the past 24 hours.
-  	  if (items[i].time > yesterday.getTime()) {
+      if (items[i].time > yesterday.getTime()) {
         // If 24 hours ago puts us in the middle of a sleep chunk, only count the
         // portion that is within the past-24-hour timespan.
-  	  	if (items[i + 1].time < yesterday.getTime()) {
+        if (items[i + 1].time < yesterday.getTime()) {
           totalSleepDuration += items[i].time - yesterday.getTime();
-	  	  } else {
-	  	    totalSleepDuration += items[i].time - items[i+1].time;
+        } else {
+          totalSleepDuration += items[i].time - items[i+1].time;
         }
-	    }
-  	  if (items[i].type != 'end' || items[i+1].type != 'start') {
-  	  	document.getElementById(items[i].id).firstChild.setAttribute('class', 'error');
-  	  	console.log('Missed logging a sleep!');
-  	  	i += 1;
-  	  } else if (items[i].id) {
-  	  	// Clear any errors.
-  	  	document.getElementById(items[i].id).firstChild.removeAttribute('class');
-  	  }
-  	  let sleepDuration = prettyPrintDuration(items[i].time, items[i+1].time);
-  	  if (items[i].id) {
-	  	  document.getElementById(items[i].id).firstChild.children[2].innerHTML = 'sleep ended (' + sleepDuration + ')';
-	  	}
-  	}
-  	sleepAnalysis.innerHTML = parseFloat(totalSleepDuration / (60 * 60 * 1000)).toFixed(2);
+      }
+      if (items[i].type != 'end' || items[i+1].type != 'start') {
+        document.getElementById(items[i].id).firstChild.setAttribute('class', 'error');
+        console.log('Missed logging a sleep!');
+        i += 1;
+      } else if (items[i].id) {
+        // Clear any errors.
+        document.getElementById(items[i].id).firstChild.removeAttribute('class');
+      }
+      let sleepDuration = prettyPrintDuration(items[i].time, items[i+1].time);
+      if (items[i].id) {
+        document.getElementById(items[i].id).firstChild.children[2].innerHTML = 'sleep ended (' + sleepDuration + ')';
+      }
+    }
+    sleepAnalysis.innerHTML = parseFloat(totalSleepDuration / (60 * 60 * 1000)).toFixed(2);
   } else if (category == 'feeds') {
-  	let count = 0;
-  	for (let i = 0; i < items.length; i++) {
-  	  if (items[i].time < yesterday.getTime()) {
-  	  	break;
-  	  }
-  	  count += 1;
-  	}
-  	feedAnalysis.innerHTML = count;
-  	// TODO: Go back further in case this was a bottle feed or after a pump.
-  	nextSide.innerHTML = items[0].type == 'left' ? 'Righty' : 'Lefty';
-  	lastFeedTime.innerHTML = prettyPrintDuration(now.getTime(), items[0].time);
+    let count = 0;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].time < yesterday.getTime()) {
+        break;
+      }
+      count += 1;
+    }
+    feedAnalysis.innerHTML = count;
+    // TODO: Go back further in case this was a bottle feed or after a pump.
+    nextSide.innerHTML = items[0].type == 'left' ? 'Righty' : 'Lefty';
+    lastFeedTime.innerHTML = prettyPrintDuration(now.getTime(), items[0].time);
   }
 }
 
@@ -511,6 +511,6 @@ document.onclick = function(){
 initializeDateTime();
 setInterval(() => {
   Object.keys(cachedData).forEach((category) => {
-	analyzeData(category, cachedData[category]);
+  analyzeData(category, cachedData[category]);
   });
 }, 60000);
